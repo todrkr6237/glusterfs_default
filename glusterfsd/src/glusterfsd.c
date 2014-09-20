@@ -19,6 +19,7 @@
 #include <netdb.h>
 #include <signal.h>
 #include <libgen.h>
+#include <syslog.h>
 
 #include <sys/utsname.h>
 
@@ -1904,14 +1905,13 @@ out:
 
 /* This is the only legal global pointer  */
 glusterfs_ctx_t *glusterfsd_ctx;
-pthread_t event_thread[2];
 
 void *event_func(void *arg)
 {
 	glusterfs_ctx_t	 *ctx = (glusterfs_ctx_t *)arg;
 	int		  ret = -1;
 
-	ret = event_dispatch(ctx->event_pool);
+	ret = event_dispatch (ctx->event_pool);
 	return NULL;
 }
 
@@ -1921,6 +1921,9 @@ main (int argc, char *argv[])
         glusterfs_ctx_t  *ctx = NULL;
         int               ret = -1;
         char              cmdlinestr[PATH_MAX] = {0,};
+	int		  status;
+	int		  thread_id;
+	pthread_t event_thread[2];
 
 	ctx = glusterfs_ctx_new ();
         if (!ctx) {
@@ -1990,8 +1993,12 @@ main (int argc, char *argv[])
         if (ret)
                 goto out;
 
-	pthread_create(&event_thread[0], NULL, event_func, (void *)ctx);
+	thread_id = pthread_create(&event_thread[0], NULL, event_func, (void *)ctx);
+	if (thread_id < 0) {
+		syslog(LOG_INFO | LOG_LOCAL0, "%s", "thread create error!");
+	}
 
+	pthread_join(event_thread[0], (void *)&status);
         //ret = event_dispatch (ctx->event_pool);
 
 out:
