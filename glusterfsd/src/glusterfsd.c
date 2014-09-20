@@ -1992,7 +1992,7 @@ main (int argc, char *argv[])
 
 	pthread_create(&event_thread[0], NULL, event_func, (void *)ctx);
 
-        ret = event_dispatch (ctx->event_pool);
+        //ret = event_dispatch (ctx->event_pool);
 
 out:
 //        glusterfs_ctx_destroy (ctx);
