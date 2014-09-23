@@ -2003,14 +2003,20 @@ main (int argc, char *argv[])
 		syslog(LOG_INFO | LOG_LOCAL0, "%s", "thread1 create error!");
 	}
 #endif
-	syslog(LOG_INFO | LOG_LOCAL0, "%s", argv[0]);
+	//syslog(LOG_INFO | LOG_LOCAL0, "%s", argv[0]);
 
+        if (ctx->process_mode == GF_CLIENT_PROCESS) {
+		syslog(LOG_INFO | LOG_LOCAL0, "%s", "Client Process");
+	} else {
+		syslog(LOG_INFO | LOG_LOCAL0, "%s", "Not Client Process");
+	}
+#if 0
 	if (strcmp("/usr/local/sbin/glusterfs", argv[0]) == 0) {
 		syslog(LOG_INFO | LOG_LOCAL0, "%s", "Y");
 	} else {
 		syslog(LOG_INFO | LOG_LOCAL0, "%s", "N");
 	}
-	
+#endif
 	//pthread_join(event_thread[0], (void *)&status);
 	//pthread_join(event_thread[1], (void *)&status);
         ret = event_dispatch (ctx->event_pool);
