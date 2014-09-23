@@ -2005,7 +2005,7 @@ main (int argc, char *argv[])
 #endif
 	syslog(LOG_INFO | LOG_LOCAL0, "%s", argv[0]);
 
-	if (strcmp("/usr/local/sbin/glusterfs", argv[0])) {
+	if (strcmp("/usr/local/sbin/glusterfs", argv[0]) == 0) {
 		syslog(LOG_INFO | LOG_LOCAL0, "%s", "Y");
 	} else {
 		syslog(LOG_INFO | LOG_LOCAL0, "%s", "N");
