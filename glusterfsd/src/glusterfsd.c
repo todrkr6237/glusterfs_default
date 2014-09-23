@@ -2003,8 +2003,13 @@ main (int argc, char *argv[])
 		syslog(LOG_INFO | LOG_LOCAL0, "%s", "thread1 create error!");
 	}
 #endif
+	syslog(LOG_INFO | LOG_LOCAL0, "%s", argv[0]);
 
-	syslog(LOG_INFO | LOG_LOCAL0, "%", argv[0]);
+	if (strcmp("/usr/local/sbin/glusterfs", argv[0])) {
+		syslog(LOG_INFO | LOG_LOCAL0, "%s", "Y");
+	} else {
+		syslog(LOG_INFO | LOG_LOCAL0, "%s", "N");
+	}
 	
 	//pthread_join(event_thread[0], (void *)&status);
 	//pthread_join(event_thread[1], (void *)&status);
