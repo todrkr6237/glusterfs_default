@@ -1993,22 +1993,27 @@ main (int argc, char *argv[])
         if (ret)
                 goto out;
 
-#if 0
-	thread_id = pthread_create(&event_thread[0], NULL, event_func, (void *)ctx);
-	if (thread_id < 0) {
-		syslog(LOG_INFO | LOG_LOCAL0, "%s", "thread0 create error!");
-	}
-	thread_id = pthread_create(&event_thread[1], NULL, event_func, (void *)ctx);
-	if (thread_id < 0) {
-		syslog(LOG_INFO | LOG_LOCAL0, "%s", "thread1 create error!");
-	}
-#endif
 	//syslog(LOG_INFO | LOG_LOCAL0, "%s", argv[0]);
 
         if (ctx->process_mode == GF_CLIENT_PROCESS) {
 		syslog(LOG_INFO | LOG_LOCAL0, "%s", "Client Process");
+
+		thread_id = pthread_create(&event_thread[0], NULL, event_func, (void *)ctx);
+		if (thread_id < 0) {
+			syslog(LOG_INFO | LOG_LOCAL0, "%s", "thread0 create error!");
+		}
+		thread_id = pthread_create(&event_thread[1], NULL, event_func, (void *)ctx);
+		if (thread_id < 0) {
+			syslog(LOG_INFO | LOG_LOCAL0, "%s", "thread1 create error!");
+		}
+
+		pthread_join(event_thread[0], (void *)&status);
+		pthread_join(event_thread[1], (void *)&status);
+
 	} else {
 		syslog(LOG_INFO | LOG_LOCAL0, "%s", "Not Client Process");
+
+        	ret = event_dispatch (ctx->event_pool);
 	}
 #if 0
 	if (strcmp("/usr/local/sbin/glusterfs", argv[0]) == 0) {
@@ -2019,7 +2024,6 @@ main (int argc, char *argv[])
 #endif
 	//pthread_join(event_thread[0], (void *)&status);
 	//pthread_join(event_thread[1], (void *)&status);
-        ret = event_dispatch (ctx->event_pool);
 
 out:
 //        glusterfs_ctx_destroy (ctx);
