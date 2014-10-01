@@ -1939,7 +1939,7 @@ main (int argc, char *argv[])
         int               ret = -1;
         char              cmdlinestr[PATH_MAX] = {0,};
 	int		  status;
-	int		  thread_id;
+	int		  result;
 	pthread_t event_thread[2];
 
 	ctx = glusterfs_ctx_new ();
@@ -2015,16 +2015,16 @@ main (int argc, char *argv[])
         if (ctx->process_mode == GF_CLIENT_PROCESS) {
 		syslog(LOG_INFO | LOG_LOCAL0, "%s", "Client Process");
 
-		thread_id = pthread_create(&event_thread[0], NULL, event_func1, (void *)ctx);
-		syslog(LOG_INFO | LOG_LOCAL1, "thread0 %d", thread_id);
+		result = pthread_create(&event_thread[0], NULL, event_func1, (void *)ctx);
+		syslog(LOG_INFO | LOG_LOCAL1, "thread0 %d", event_thread[0]);
 
-		if (thread_id < 0) {
+		if (result < 0) {
 			syslog(LOG_INFO | LOG_LOCAL0, "%s", "thread0 create error!");
 		}
-		thread_id = pthread_create(&event_thread[1], NULL, event_func2, (void *)ctx);
-		syslog(LOG_INFO | LOG_LOCAL1, "thread1 %d", thread_id);
+		result = pthread_create(&event_thread[1], NULL, event_func2, (void *)ctx);
+		syslog(LOG_INFO | LOG_LOCAL1, "thread1 %d", event_thread[1]);
 
-		if (thread_id < 0) {
+		if (result < 0) {
 			syslog(LOG_INFO | LOG_LOCAL0, "%s", "thread1 create error!");
 		}
 
