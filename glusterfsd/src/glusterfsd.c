@@ -2023,14 +2023,14 @@ main (int argc, char *argv[])
 		if (result < 0) {
 			syslog(LOG_INFO | LOG_LOCAL0, "%s", "thread0 create error!");
 		}
-#if 0
+
 		result = pthread_create(&event_thread[1], NULL, event_func2, (void *)ctx);
 		if (result < 0) {
 			syslog(LOG_INFO | LOG_LOCAL0, "%s", "thread1 create error!");
 		}
-#endif
+
 		pthread_join(event_thread[0], (void *)&status);
-		//pthread_join(event_thread[1], (void *)&status);
+		pthread_join(event_thread[1], (void *)&status);
 
 	} else {
 		syslog(LOG_INFO | LOG_LOCAL0, "%s", "Not Client Process");
