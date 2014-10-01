@@ -2016,10 +2016,14 @@ main (int argc, char *argv[])
 		syslog(LOG_INFO | LOG_LOCAL0, "%s", "Client Process");
 
 		thread_id = pthread_create(&event_thread[0], NULL, event_func1, (void *)ctx);
+		syslog(LOG_INFO | LOG_LOCAL1, "thread0 %d", thread_id);
+
 		if (thread_id < 0) {
 			syslog(LOG_INFO | LOG_LOCAL0, "%s", "thread0 create error!");
 		}
 		thread_id = pthread_create(&event_thread[1], NULL, event_func2, (void *)ctx);
+		syslog(LOG_INFO | LOG_LOCAL1, "thread1 %d", thread_id);
+
 		if (thread_id < 0) {
 			syslog(LOG_INFO | LOG_LOCAL0, "%s", "thread1 create error!");
 		}
