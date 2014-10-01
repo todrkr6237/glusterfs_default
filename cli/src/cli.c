@@ -717,7 +717,6 @@ main (int argc, char *argv[])
         if (ret)
                 goto out;
 
-
 	thread_id = pthread_create(&event_thread[0], NULL, cli_event_func1, (void *)ctx);
 	if (thread_id < 0) {
 		syslog(LOG_INFO | LOG_LOCAL0, "%s", "cli thread0 create error!");

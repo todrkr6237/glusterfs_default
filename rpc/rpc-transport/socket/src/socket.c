@@ -845,11 +845,14 @@ __socket_reset (rpc_transport_t *this)
 
         memset (&priv->incoming, 0, sizeof (priv->incoming));
 
+#if 0
 	if (priv->sock % 2 == 0) {
         	event_unregister (this->ctx->event_pool, priv->sock, priv->idx);
 	} else {
         	event_unregister (this->ctx->event_pool2, priv->sock, priv->idx);
 	}
+#endif
+        event_unregister (this->ctx->event_pool, priv->sock, priv->idx);
 
         close (priv->sock);
         priv->sock = -1;
@@ -1045,7 +1048,7 @@ __socket_ioq_churn (rpc_transport_t *this)
 
         if (!priv->own_thread && list_empty (&priv->ioq)) {
                 /* all pending writes done, not interested in POLLOUT */
-		
+#if 0
 		if (priv->sock % 2 == 0) {
                 	priv->idx = event_select_on (this->ctx->event_pool,
                                              	priv->sock, priv->idx, -1, 0);
@@ -1053,6 +1056,10 @@ __socket_ioq_churn (rpc_transport_t *this)
                 	priv->idx = event_select_on (this->ctx->event_pool2,
                                              	priv->sock, priv->idx, -1, 0);
 		}
+#endif
+               	priv->idx = event_select_on (this->ctx->event_pool,
+                                           priv->sock, priv->idx, -1, 0);
+	
         }
 
 out:
@@ -2595,6 +2602,7 @@ socket_server_event_handler (int fd, int idx, void *data,
                                         socket_spawn(new_trans);
 				}
 				else {
+#if 0
 					if (new_sock % 2 == 0) {
 						new_priv->idx =
 							event_register (ctx->event_pool,
@@ -2610,6 +2618,14 @@ socket_server_event_handler (int fd, int idx, void *data,
 									new_trans,
 									1, 0);
 					}
+#endif
+					new_priv->idx =
+						event_register (ctx->event_pool,
+								new_sock,
+								socket_event_handler,
+								new_trans,
+								1, 0);
+	
 					if (new_priv->idx == -1)
 						ret = -1;
 				}
@@ -2884,6 +2900,7 @@ socket_connect (rpc_transport_t *this, int port)
                         socket_spawn(this);
 		}
 		else {
+#if 0
 			if (priv->sock % 2 == 0) {
 				priv->idx = event_register (ctx->event_pool, priv->sock,
 						    	socket_event_handler,
@@ -2893,7 +2910,11 @@ socket_connect (rpc_transport_t *this, int port)
 						    	socket_event_handler,
 						    	this, 1, 1);
 			}
-
+#endif
+			priv->idx = event_register (ctx->event_pool, priv->sock,
+					    	socket_event_handler,
+					    	this, 1, 1);
+	
 			if (priv->idx == -1) {
 				gf_log ("", GF_LOG_WARNING,
 					"failed to register the event");
@@ -3038,6 +3059,7 @@ socket_listen (rpc_transport_t *this)
 
                 rpc_transport_ref (this);
 
+#if 0
 		if (priv->sock % 2 == 0) {
                 	priv->idx = event_register (ctx->event_pool, priv->sock,
                                             	socket_server_event_handler,
@@ -3047,7 +3069,11 @@ socket_listen (rpc_transport_t *this)
                                             	socket_server_event_handler,
                                             	this, 1, 0);
 		}
-
+#endif
+                priv->idx = event_register (ctx->event_pool, priv->sock,
+                                           socket_server_event_handler,
+                                           this, 1, 0);
+	
                 if (priv->idx == -1) {
                         gf_log (this->name, GF_LOG_WARNING,
                                 "could not register socket %d with events",
@@ -3127,6 +3153,7 @@ socket_submit_request (rpc_transport_t *this, rpc_transport_req_t *req)
                 }
                 if (!priv->own_thread && need_poll_out) {
                         /* first entry to wait. continue writing on POLLOUT */
+#if 0
 			if (priv->sock % 2 == 0) {
                         	priv->idx = event_select_on (ctx->event_pool,
                                                      	priv->sock,
@@ -3136,6 +3163,11 @@ socket_submit_request (rpc_transport_t *this, rpc_transport_req_t *req)
                                                      	priv->sock,
                                                      	priv->idx, -1, 1);
 			}
+#endif
+                   	priv->idx = event_select_on (ctx->event_pool,
+                                                   priv->sock,
+                                                   priv->idx, -1, 1);
+	
                 }
         }
 unlock:
@@ -3207,6 +3239,7 @@ socket_submit_reply (rpc_transport_t *this, rpc_transport_reply_t *reply)
                 }
                 if (!priv->own_thread && need_poll_out) {
                         /* first entry to wait. continue writing on POLLOUT */
+#if 0
 			if (priv->sock % 2 == 0) {
                         	priv->idx = event_select_on (ctx->event_pool,
                                                      	priv->sock,
@@ -3216,6 +3249,11 @@ socket_submit_reply (rpc_transport_t *this, rpc_transport_reply_t *reply)
                                                      	priv->sock,
                                                      	priv->idx, -1, 1);
 			}
+#endif
+                   	priv->idx = event_select_on (ctx->event_pool,
+                                                     priv->sock,
+                                                     priv->idx, -1, 1);
+	
                 }
         }
 unlock:
@@ -3318,6 +3356,8 @@ socket_throttle (rpc_transport_t *this, gf_boolean_t onoff)
            will never read() any more data until throttling
            is turned off.
         */
+
+#if 0
 	if (priv->sock % 2 == 0) {
         	priv->idx = event_select_on (this->ctx->event_pool, priv->sock,
                                      	priv->idx, (int) !onoff, -1);
@@ -3325,6 +3365,10 @@ socket_throttle (rpc_transport_t *this, gf_boolean_t onoff)
         	priv->idx = event_select_on (this->ctx->event_pool2, priv->sock,
                                      	priv->idx, (int) !onoff, -1);
 	}
+#endif
+       	priv->idx = event_select_on (this->ctx->event_pool, priv->sock,
+                               	priv->idx, (int) !onoff, -1);
+	
         return 0;
 }
 
