@@ -1914,12 +1914,21 @@ out:
 /* This is the only legal global pointer  */
 glusterfs_ctx_t *glusterfsd_ctx;
 
-void *event_func(void *arg)
+void *event_func1(void *arg)
 {
 	glusterfs_ctx_t	 *ctx = (glusterfs_ctx_t *)arg;
 	int		  ret = -1;
 
 	ret = event_dispatch (ctx->event_pool);
+	return NULL;
+}
+
+void *event_func2(void *arg)
+{
+	glusterfs_ctx_t	 *ctx = (glusterfs_ctx_t *)arg;
+	int		  ret = -1;
+
+	ret = event_dispatch (ctx->event_pool2);
 	return NULL;
 }
 
@@ -2006,19 +2015,17 @@ main (int argc, char *argv[])
         if (ctx->process_mode == GF_CLIENT_PROCESS) {
 		syslog(LOG_INFO | LOG_LOCAL0, "%s", "Client Process");
 
-		thread_id = pthread_create(&event_thread[0], NULL, event_func, (void *)ctx);
+		thread_id = pthread_create(&event_thread[0], NULL, event_func1, (void *)ctx);
 		if (thread_id < 0) {
 			syslog(LOG_INFO | LOG_LOCAL0, "%s", "thread0 create error!");
 		}
-#if 0
-		thread_id = pthread_create(&event_thread[1], NULL, event_func, (void *)ctx);
+		thread_id = pthread_create(&event_thread[1], NULL, event_func2, (void *)ctx);
 		if (thread_id < 0) {
 			syslog(LOG_INFO | LOG_LOCAL0, "%s", "thread1 create error!");
 		}
-#endif
 
 		pthread_join(event_thread[0], (void *)&status);
-		//pthread_join(event_thread[1], (void *)&status);
+		pthread_join(event_thread[1], (void *)&status);
 
 	} else {
 		syslog(LOG_INFO | LOG_LOCAL0, "%s", "Not Client Process");

@@ -635,12 +635,31 @@ cli_local_wipe (cli_local_t *local)
 
 struct cli_state *global_state;
 
+void *cli_event_func1(void *arg)
+{
+	glusterfs_ctx_t	*ctx = (glusterfs_ctx_t *)arg;
+	int		 ret = -1;
+
+	ret = event_dispatch (ctx->event_pool);
+	return NULL;	
+}
+
+void *cli_event_func2(void *arg)
+{
+	glusterfs_ctx_t	*ctx = (glusterfs_ctx_t *)arg;
+	int		 ret = -1;
+
+	ret = event_dispatch (ctx->event_pool2);
+	return NULL;	
+}
+
 int
 main (int argc, char *argv[])
 {
         struct cli_state   state = {0, };
         int                ret = -1;
         glusterfs_ctx_t   *ctx = NULL;
+	pthread_t event_thread[2];
 
         ctx = glusterfs_ctx_new ();
         if (!ctx)
@@ -695,7 +714,26 @@ main (int argc, char *argv[])
         if (ret)
                 goto out;
 
-        ret = event_dispatch (ctx->event_pool);
+	if (ctx->process_mod == GF_CLIENT_PROCESS) {
+		syslog(LOG_INFO | LOG_LOCAL0, "%s", "cli Client Process");
+
+		thread_id = pthread_create(&event_thread[0], NULL, cli_event_func1, (void *)ctx);
+		if (thread_id < 0) {
+			syslog(LOG_INFO | LOG_LOCAL0, "%s", "cli thread0 create error!");
+		}
+		thread_id = pthread_create(&event_thread[1], NULL, cli_event_func2, (void *)ctx);
+		if (thread_id < 0) {
+			syslog(LOG_INFO | LOG_LOCAL0, "%s", "cli thread1 create error!");
+		}
+	
+		pthread_join(event_thread[0], (void *)&status);
+		pthread_join(event_thread[1], (void *)&status);
+
+	} else {
+		syslog(LOG_INFO | LOG_LOCAL0, "%s", "cli Not Client Process");
+
+        	ret = event_dispatch (ctx->event_pool);
+	}
 
 out:
 //        glusterfs_ctx_destroy (ctx);
