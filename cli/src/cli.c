@@ -18,6 +18,7 @@
 #include <netdb.h>
 #include <signal.h>
 #include <libgen.h>
+#include <syslog.h>
 
 #include <sys/utsname.h>
 
@@ -659,6 +660,8 @@ main (int argc, char *argv[])
         struct cli_state   state = {0, };
         int                ret = -1;
         glusterfs_ctx_t   *ctx = NULL;
+	int		   status;
+	int		   thread_id;
 	pthread_t event_thread[2];
 
         ctx = glusterfs_ctx_new ();
@@ -714,7 +717,7 @@ main (int argc, char *argv[])
         if (ret)
                 goto out;
 
-	if (ctx->process_mod == GF_CLIENT_PROCESS) {
+	if (ctx->process_mode == 1) {
 		syslog(LOG_INFO | LOG_LOCAL0, "%s", "cli Client Process");
 
 		thread_id = pthread_create(&event_thread[0], NULL, cli_event_func1, (void *)ctx);
