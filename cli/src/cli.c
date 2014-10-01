@@ -114,6 +114,11 @@ glusterfs_ctx_defaults_init (glusterfs_ctx_t *ctx)
         if (!ctx->event_pool)
                 return -1;
 
+        ctx->event_pool2 = event_pool_new (DEFAULT_EVENT_POOL_SIZE);
+        if (!ctx->event_pool2)
+                return -1;
+
+
         pool = GF_CALLOC (1, sizeof (call_pool_t),
                           cli_mt_call_pool_t);
         if (!pool)

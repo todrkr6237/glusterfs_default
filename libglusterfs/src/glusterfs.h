@@ -419,6 +419,7 @@ struct _glusterfs_ctx {
         void               *ib;
         struct call_pool   *pool;
         void               *event_pool;
+	void		   *event_pool2;
         void               *iobuf_pool;
         pthread_mutex_t     lock;
         size_t              page_size;

@@ -1242,6 +1242,14 @@ glusterfs_ctx_defaults_init (glusterfs_ctx_t *ctx)
                 goto out;
         }
 
+        ctx->event_pool2 = event_pool_new (DEFAULT_EVENT_POOL_SIZE);
+        if (!ctx->event_pool2) {
+                gf_log ("", GF_LOG_CRITICAL,
+                        "ERROR: glusterfs event pool2 creation failed");
+		syslog(LOG_INFO | LOG_LOCAL1, "%s", "event_pool2 creation failed");
+                goto out;
+        }
+
         ctx->pool = GF_CALLOC (1, sizeof (call_pool_t), gfd_mt_call_pool_t);
         if (!ctx->pool) {
                 gf_log ("", GF_LOG_CRITICAL,

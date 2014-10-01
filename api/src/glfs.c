@@ -85,6 +85,11 @@ glusterfs_ctx_defaults_init (glusterfs_ctx_t *ctx)
 		goto err;
 	}
 
+	ctx->event_pool2 = event_pool_new (DEFAULT_EVENT_POOL_SIZE);
+	if (!ctx->event_pool2) {
+		goto err;
+	}
+
 	ctx->env = syncenv_new (0, 0, 0);
 	if (!ctx->env) {
 		goto err;
