@@ -1919,7 +1919,7 @@ void *event_func1(void *arg)
 	glusterfs_ctx_t	 *ctx = (glusterfs_ctx_t *)arg;
 	int		  ret = -1;
 
-	syslog(LOG_INFO | LOG_LOCAL1, "thread1 %u", gettid());
+	syslog(LOG_INFO | LOG_LOCAL1, "thread1 %u", pthread_self());
 
 	ret = event_dispatch (ctx->event_pool);
 	return NULL;
@@ -1930,7 +1930,7 @@ void *event_func2(void *arg)
 	glusterfs_ctx_t	 *ctx = (glusterfs_ctx_t *)arg;
 	int		  ret = -1;
 
-	syslog(LOG_INFO | LOG_LOCAL1, "thread2 %u", gettid());
+	syslog(LOG_INFO | LOG_LOCAL1, "thread2 %u", pthread_self());
 
 	ret = event_dispatch (ctx->event_pool2);
 	return NULL;
