@@ -398,7 +398,7 @@ event_dispatch_epoll (struct event_pool *event_pool)
         int                 i = 0;
         int                 ret = -1;
 
-	syslog(LOG_INFO | LOG_LOCAL1, "%s", "event_dispath_epoll");
+	syslog(LOG_INFO | LOG_LOCAL1, "%s", "event_dispatch_epoll");
         GF_VALIDATE_OR_GOTO ("event", event_pool, out);
 
         while (1) {

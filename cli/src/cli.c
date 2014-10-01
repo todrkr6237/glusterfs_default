@@ -717,26 +717,20 @@ main (int argc, char *argv[])
         if (ret)
                 goto out;
 
-	if (ctx->process_mode == 1) {
-		syslog(LOG_INFO | LOG_LOCAL0, "%s", "cli Client Process");
 
-		thread_id = pthread_create(&event_thread[0], NULL, cli_event_func1, (void *)ctx);
-		if (thread_id < 0) {
-			syslog(LOG_INFO | LOG_LOCAL0, "%s", "cli thread0 create error!");
-		}
-		thread_id = pthread_create(&event_thread[1], NULL, cli_event_func2, (void *)ctx);
-		if (thread_id < 0) {
-			syslog(LOG_INFO | LOG_LOCAL0, "%s", "cli thread1 create error!");
-		}
-	
-		pthread_join(event_thread[0], (void *)&status);
-		pthread_join(event_thread[1], (void *)&status);
-
-	} else {
-		syslog(LOG_INFO | LOG_LOCAL0, "%s", "cli Not Client Process");
-
-        	ret = event_dispatch (ctx->event_pool);
+	thread_id = pthread_create(&event_thread[0], NULL, cli_event_func1, (void *)ctx);
+	if (thread_id < 0) {
+		syslog(LOG_INFO | LOG_LOCAL0, "%s", "cli thread0 create error!");
 	}
+	thread_id = pthread_create(&event_thread[1], NULL, cli_event_func2, (void *)ctx);
+	if (thread_id < 0) {
+		syslog(LOG_INFO | LOG_LOCAL0, "%s", "cli thread1 create error!");
+	}
+	
+	pthread_join(event_thread[0], (void *)&status);
+	pthread_join(event_thread[1], (void *)&status);
+
+        //ret = event_dispatch (ctx->event_pool);
 
 out:
 //        glusterfs_ctx_destroy (ctx);
