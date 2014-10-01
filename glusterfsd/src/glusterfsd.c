@@ -1919,6 +1919,8 @@ void *event_func1(void *arg)
 	glusterfs_ctx_t	 *ctx = (glusterfs_ctx_t *)arg;
 	int		  ret = -1;
 
+	syslog(LOG_INFO | LOG_LOCAL1, "thread1 %u", getpid());
+
 	ret = event_dispatch (ctx->event_pool);
 	return NULL;
 }
@@ -1927,6 +1929,8 @@ void *event_func2(void *arg)
 {
 	glusterfs_ctx_t	 *ctx = (glusterfs_ctx_t *)arg;
 	int		  ret = -1;
+
+	syslog(LOG_INFO | LOG_LOCAL1, "thread2 %u", getpid());
 
 	ret = event_dispatch (ctx->event_pool2);
 	return NULL;
@@ -2016,14 +2020,11 @@ main (int argc, char *argv[])
 		syslog(LOG_INFO | LOG_LOCAL0, "%s", "Client Process");
 
 		result = pthread_create(&event_thread[0], NULL, event_func1, (void *)ctx);
-		syslog(LOG_INFO | LOG_LOCAL1, "thread0 %d", event_thread[0]);
-
 		if (result < 0) {
 			syslog(LOG_INFO | LOG_LOCAL0, "%s", "thread0 create error!");
 		}
-		result = pthread_create(&event_thread[1], NULL, event_func2, (void *)ctx);
-		syslog(LOG_INFO | LOG_LOCAL1, "thread1 %d", event_thread[1]);
 
+		result = pthread_create(&event_thread[1], NULL, event_func2, (void *)ctx);
 		if (result < 0) {
 			syslog(LOG_INFO | LOG_LOCAL0, "%s", "thread1 create error!");
 		}
