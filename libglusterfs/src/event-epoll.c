@@ -95,6 +95,7 @@ event_pool_new_epoll (int count)
 
         event_pool->count = count;
 
+	syslog(LOG_INFO | LOG_LOCAL1, "%s", "new epoll");
         pthread_mutex_init (&event_pool->mutex, NULL);
         pthread_cond_init (&event_pool->cond, NULL);
 
